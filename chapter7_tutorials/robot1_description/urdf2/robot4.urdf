@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<robot name="test_robot">
+  <link name="link1">
+    <visual>
+      <geometry>
+        <cylinder length="0.6" radius="0.2" />
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin xyz="0.0 0 0.0" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.6" radius="0.2" />
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link2">
+    <visual>
+      <geometry>
+        <box size="0.6 0.2 .1" />
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="link3" >
+    <visual>
+      <geometry>
+        <sphere radius="0.2"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="link4" >
+    <visual>
+      <origin rpy="0 -1.57 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://urdf_csdn/urdf/mesh/knife.stl"/>
+      </geometry>
+    </visual>
+  </link>
+
+
+  <joint name="joint1" type="fixed">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0.22 0 0.6" rpy="0 1.57 0" />
+  </joint>
+
+  <joint name="joint2" type="continuous">
+    <parent link="link1"/>
+    <child link="link3"/>
+    <origin xyz="-0.1 0.5 0" />
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.14" upper="3.14" effort="150.0" velocity="3.15"/>
+  </joint>
+
+  <joint name="joint3" type="fixed">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin xyz=".5 0 0" rpy="0 0 -1.57" />
+  </joint>
+</robot>

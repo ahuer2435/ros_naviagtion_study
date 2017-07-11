@@ -1,0 +1,33 @@
+roslaunch robot1_description display.launch model:="`rospack find robot1_description`/urdf2/robot3.urdf"
+roslaunch robot1_description state_xacro.launch model:="`rospack find robot1_description`/urdf/robot1_a.xacro"
+roslaunch robot1_gazebo gazebo.launch model:="`rospack find robot1_description`/urdf/robot1_base_02.xacro"
+roslaunch robot1_gazebo gazebo.launch model:="`rospack find robot1_description`/urdf/robot1_base_03.xacro"
+roslaunch gazebo_ros willowgarage_world.launch 
+roslaunch robot1_gazebo gazebo_wg.launch 
+
+
+
+roslaunch urdf_tutorial display.launch model:="`rospack find robot1_description`/urdf2/robot1.xacro"
+
+
+1. roslaunch robot1_description display.launch model:="`rospack find robot1_description`/urdf/robot1_a.xacro"
+使用display.launch显示robot model，主要各个link关系：base_link为各个轮子的link的父link。
+
+2. roslaunch robot1_description state_xacro.launch model:="`rospack find robot1_description`/urdf/robot1_a.xacro"
+利用odom和base_link坐标系的转化，实现robot的移动
+
+3.roslaunch robot1_gazebo gazebo.launch model:="`rospack find robot1_description`/urdf/robot1_base_03_b.xacro"
+增加radar 和 camera
+
+4. roslaunch robot1_gazebo gazebo_wg_1.launch
+测试加载地图和机器人 
+
+5.  	roslaunch robot1_gazebo gazebo_wg_2.launch
+	rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+移动机器人
+
+
+
+
+
+

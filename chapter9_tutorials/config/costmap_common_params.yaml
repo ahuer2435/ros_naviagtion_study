@@ -1,0 +1,14 @@
+obstacle_range: 2.5
+raytrace_range: 3.0
+footprint: [[-0.2,-0.2],[-0.2,0.2], [0.2, 0.2], [0.2,-0.2]]
+inflation_radius: 0.5
+cost_scaling_factor: 10.0
+static_layer:
+   enabled:            true
+obstacle_layer:
+  observation_sources: scan
+  scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0, inf_is_valid: true}
+  track_unknown_space: true
+inflation_layer:
+  inflation_radius: 0.40
+  cost_scaling_factor: 2.0

@@ -1,0 +1,18 @@
+TrajectoryPlannerROS:
+  controller_frequency: 3.0		#局部路径更新频率
+  controller_patiente: 15.0		#不明白
+  max_vel_x: 0.2			#最大x轴线速度m/s
+  min_vel_x: 0.0			#最小x轴线速度
+  max_rotational_vel: 0.15
+  max_rotational_vel: 0.0
+  min_in_place_rotational_vel: 0.01
+  min_in_place_vel_theta: 0.00
+  max_vel_theta: 0.15			#最大角速度rad/s
+  min_vel_theta: -0.15			#最小角速度
+  acc_lim_theta: 2.0			#最大角加速度rad/s2
+  acc_lim_x: 0.4			#最大x轴线加速度m/s2
+  acc_lim_y: 0.0			#最大y轴线加速度m/s2
+  yaw_goal_tolerance: 0.1		#离目标方位偏差rad
+  xy_goal_tolerance: 0.1		#离目标位置偏差m
+  
+  holonomic_robot: false

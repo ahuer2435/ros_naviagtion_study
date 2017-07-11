@@ -1,0 +1,31 @@
+1. roslaunch chapter8_tutorials gazebo_map_robot.launch model:="`rospack find chapter8_tutorials`/urdf/robot1_base_01_b.xacro"
+rosrun tf view_frames
+
+tf_broadcast定义base_link和base_laser的坐标关系，tf_listener定义base_laser下坐标点，并打印出相应base_link下的坐标点。
+
+2.roslaunch chapter8_tutorials gazebo_xacro.launch model:="`rospack find robot1_description`/urdf/robot1_base_04.xacro"
+rosrun teleop_twist_keyboard teleop_twt_keyboard.py
+学习里程数据
+
+3.roslaunch chapter8_tutorials display.launch model:="`rospack find chapter8_tutorials`/urdf/robot1_base_04.xacro"
+里程数据（话题odom）包括位置，位姿，线速度，角速度。odom坐标系不和实际物体相关，可作为参考系。反映机器人的运动信息。
+tf数据是（话题tf）坐标系之间的关系，每个连接都有自己的坐标系，物体运动时，坐标系也随着运动。控制机器人如何运动。
+
+4. roslaunch chapter8_tutorials gazebo_xacro.launch model:="`rospack find chapter8_tutorials`/urdf/robot1_base_04.xacro"
+rosrun teleop_twist_keyboard teleop_twist_keyboard.py 
+接口：cmd_vel--->base_controller--->控制机器人移动
+
+5. roslaunch chapter8_tutorials gazebo_mapping_robot_2.launch model:="`rospack find chapter8_tutorials`/urdf/robot1_base_04.xacro"
+roslaunch chapter8_tutorials gazebo_mapping_robot_2.launch model:="`rospack find robot1_description`/urdf/robot1_base_04_src.xacro"（无误）
+使用仿真建图学习：
+5.1  在urdf/xacro文件中构建机器人模型，使用雷达插件，用于扫描建图；设置雷达坐标系与base_link坐标系关系；使用运动控制插件，用于移动机器人；
+5.2  使用joint_state_publisher发布机器人各个关节／坐标系相对位置，使用robot_state_publisher进行tf转换。
+5.3  在gazebo中使用机器人模型。
+5.4  启动slam_mapping,使用雷达信息和里程信息，构建地图。
+
+6. rosrun map_server map_saver -f map
+保存地图
+
+7.roslaunch chapter8_tutorials gazebo_map_robot.launch model:="`rospack find chapter8_tutorials`/urdf/robot1_base_04.xacro"（失败）
+roslaunch chapter8_tutorials gazebo_mapping_robot_load_map.launch model:="`rospack find robot1_description`/urdf/robot1_base_04_src.xacro"（失败）
+加载地图（fail）
