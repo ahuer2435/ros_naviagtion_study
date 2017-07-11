@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -g   -shared -Wl,-soname,libgtest.so -o libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o  -L/home/yanqiao/work/src/navigation/navigation/build-move_base-Desktop_Qt_5_6_0_GCC_64bit-Default/gtest/src -lpthread -Wl,-rpath,/home/yanqiao/work/src/navigation/navigation/build-move_base-Desktop_Qt_5_6_0_GCC_64bit-Default/gtest/src 

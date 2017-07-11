@@ -1,0 +1,8 @@
+prefix=/home/yanqiao/work/src/navigation/navigation/build-move_base-Desktop_Qt_5_6_0_GCC_64bit-Default/devel
+
+Name: move_base
+Description: Description of move_base
+Version: 1.12.13
+Cflags: -I/home/yanqiao/work/src/navigation/navigation/build-move_base-Desktop_Qt_5_6_0_GCC_64bit-Default/devel/include
+Libs: -L/home/yanqiao/work/src/navigation/navigation/build-move_base-Desktop_Qt_5_6_0_GCC_64bit-Default/devel/lib 
+Requires: roscpp dynamic_reconfigure
