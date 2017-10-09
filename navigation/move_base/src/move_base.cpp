@@ -67,7 +67,7 @@ namespace move_base {
     /*
      * 定义一个actionserver，基于actionlib框架，可以建立一个server,
      * client可以发送可抢断的taskrequest,可以将之前的taskrequest取消，覆盖。
-     * 并且可以不断得到反馈的框架。基于此框架，使用client请求时，都会执行executeCb函数
+     * 并且可以不断得到反馈的框架。基于此框架，使用client请求时，都会执行executeCb函数.
     */
     //定义ActionServer
     as_ = new MoveBaseActionServer(ros::NodeHandle(), "move_base", boost::bind(&MoveBase::executeCb, this, _1), false);
@@ -103,7 +103,9 @@ namespace move_base {
     //启动了一个全局规划器线程
     /*
      * planThread是工作线程,这个线程会根据一个target调用plan算法生成一个plan.
-     * 一个Plan其实就是一些点(内容是啥？)，而之后具体使用这些点去驱动底座行走，并不是本thread的工作内容
+     * 一个Plan其实就是一些点(内容是啥？)，而之后具体使用这些点去驱动底座行走，并不是本thread的工作内容。
+     * 全局规划器是以boost::thread形式实现的。
+     * 本节点一启动就构造一个实现全局规划器的线程。
     */
     //set up the planner's thread
     planner_thread_ = new boost::thread(boost::bind(&MoveBase::planThread, this));
@@ -657,16 +659,21 @@ namespace move_base {
     // we have slept long enough for rate
     planner_cond_.notify_one();
   }
-
+/*
+ * 实现全局规划器，
+*/
   void MoveBase::planThread(){
     ROS_DEBUG_NAMED("move_base_plan_thread","Starting planner thread...");
     ros::NodeHandle n;
     ros::Timer timer;
     bool wait_for_wake = false;
-    boost::unique_lock<boost::mutex> lock(planner_mutex_);
+    boost::unique_lock<boost::mutex> lock(planner_mutex_);      //上锁planner_mutex_
     while(n.ok()){
       //check if we should run the planner (the mutex is locked)
-         //等待上面的executeCb函数使得runPlanner_ = true
+         /*
+          * 检测是否不该运行规划器，若是，则挂起。利用变量runPlanner_和变量wait_for_wake
+          * 等待上面的executeCb函数使得runPlanner_ = true
+        */
       while(wait_for_wake || !runPlanner_){
         //if we should not be running the planner then suspend this thread
         ROS_DEBUG_NAMED("move_base_plan_thread","Planner thread is suspending");
