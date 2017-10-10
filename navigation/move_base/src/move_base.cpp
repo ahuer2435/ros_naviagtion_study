@@ -562,6 +562,7 @@ namespace move_base {
     tc_.reset();
   }
 
+  /*利用全局地图，进行全局规划。*/
   bool MoveBase::makePlan(const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan){
     boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(planner_costmap_ros_->getCostmap()->getMutex()));
 
@@ -569,12 +570,18 @@ namespace move_base {
     plan.clear();
 
     //since this gets called on handle activate
+    /*
+     * planner_costmap_ros_ 存储的全局代价地图。
+    */
     if(planner_costmap_ros_ == NULL) {
       ROS_ERROR("Planner costmap ROS is NULL, unable to create global plan");
       return false;
     }
 
     //get the starting pose of the robot
+    /*
+     * 获取机器人的起始位置。
+    */
     tf::Stamped<tf::Pose> global_pose;
     if(!planner_costmap_ros_->getRobotPose(global_pose)) {
       ROS_WARN("Unable to get starting pose of robot, unable to create global plan");
@@ -585,6 +592,9 @@ namespace move_base {
     tf::poseStampedTFToMsg(global_pose, start);
 
     //if the planner fails or returns a zero length plan, planning failed
+    /*
+     * start:机器人起始位置，goal：目标点。plan：全局规划器规划的线路。
+    */
     if(!planner_->makePlan(start, goal, plan) || plan.empty()){
       ROS_DEBUG_NAMED("move_base","Failed to find a  plan to point (%.2f, %.2f)", goal.pose.position.x, goal.pose.position.y);
       return false;
@@ -660,7 +670,10 @@ namespace move_base {
     planner_cond_.notify_one();
   }
 /*
- * 实现全局规划器，
+ * 实现全局规划器，全局规划器规划运行方式：
+ * 1. 通常停在685L，planner_cond_.wait(lock);阻塞队列中。
+ * 2. 第一次由目标点到来时，executeCb函数中的通知planner_cond_.notify_one()，解锁阻塞队列，进行全局规划。
+ * 3. 之后加锁之后，设置一个定时器，再次进入阻塞队列，超时则唤醒阻塞队列中的本线程。全局规划器的运行时机。
 */
   void MoveBase::planThread(){
     ROS_DEBUG_NAMED("move_base_plan_thread","Starting planner thread...");
@@ -677,6 +690,10 @@ namespace move_base {
       while(wait_for_wake || !runPlanner_){
         //if we should not be running the planner then suspend this thread
         ROS_DEBUG_NAMED("move_base_plan_thread","Planner thread is suspending");
+        /*
+         * planner_cond_.wait释放锁，并挂起当前线程，放入阻塞队列；当收到planner_cond_.notify_one()
+         * 将当前进程放入互斥队列，然后申请到锁之后，继续执行。
+        */
         planner_cond_.wait(lock);
         wait_for_wake = false;
       }
@@ -684,13 +701,13 @@ namespace move_base {
 
       //time to plan! get a copy of the goal and unlock the mutex
       geometry_msgs::PoseStamped temp_goal = planner_goal_;
-      lock.unlock();
+      lock.unlock();        //提前释放锁
       ROS_DEBUG_NAMED("move_base_plan_thread","Planning...");
 
       //路径规划global
       //run planner
       planner_plan_->clear();
-      //planner_plan_是规划结果，是一些map坐标系下的点。
+      //planner_plan_是规划结果，是一些map坐标系下的点。规划过程并没有加锁
       bool gotPlan = n.ok() && makePlan(temp_goal, *planner_plan_);
       //一次规划成功
       if(gotPlan){
@@ -735,10 +752,14 @@ namespace move_base {
       }
 
       //take the mutex for the next iteration
-      lock.lock();
+      lock.lock();          //对应684line
 
       //定时器，多久没有规划路径，就通知一次规划路径
       //setup sleep interface if needed
+      /*
+       * sleep_time不是直接用ros::Duration(1.0/planner_frequency_)，说明休眠时间其实是包含了规划时间，如果规划时间超过了，感觉这里就会被唤醒了，
+       * 似乎是个风险项。
+        */
       if(planner_frequency_ > 0){
         ros::Duration sleep_time = (start_time + ros::Duration(1.0/planner_frequency_)) - ros::Time::now();
         if (sleep_time > ros::Duration(0.0)){
