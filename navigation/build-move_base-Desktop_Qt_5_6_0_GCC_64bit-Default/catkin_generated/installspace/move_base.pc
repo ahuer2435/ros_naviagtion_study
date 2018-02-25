@@ -1,8 +1,0 @@
-prefix=/usr/local
-
-Name: move_base
-Description: Description of move_base
-Version: 1.12.13
-Cflags: -I/usr/local/include
-Libs: -L/usr/local/lib 
-Requires: roscpp dynamic_reconfigure
